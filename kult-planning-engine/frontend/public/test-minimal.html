@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Test - KULT</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { margin-top: 0; }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px;
+            background: rgba(255,255,255,0.2);
+        }
+        .success { background: rgba(0,255,0,0.3); }
+        .error { background: rgba(255,0,0,0.3); }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button:hover { background: #45a049; }
+        #console-log {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 KULT Platform - Diagnostic Test</h1>
+        
+        <div id="status" class="status">
+            Testing platform components...
+        </div>
+
+        <button onclick="testBackend()">1. Test Backend API</button>
+        <button onclick="testFrontend()">2. Test Frontend Assets</button>
+        <button onclick="testReactApp()">3. Test React App Load</button>
+        <button onclick="testAIChat()">4. Test AI Chat Endpoint</button>
+        <button onclick="runAllTests()">▶️ RUN ALL TESTS</button>
+
+        <div id="console-log"></div>
+    </div>
+
+    <script>
+        const log = (msg, type = 'info') => {
+            const logDiv = document.getElementById('console-log');
+            const colors = {
+                info: '#00bfff',
+                success: '#00ff00',
+                error: '#ff0000',
+                warning: '#ffaa00'
+            };
+            logDiv.innerHTML += `<div style="color: ${colors[type]}">${new Date().toLocaleTimeString()}: ${msg}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(msg);
+        };
+
+        const setStatus = (msg, isSuccess) => {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = msg;
+            statusDiv.className = 'status ' + (isSuccess ? 'success' : 'error');
+        };
+
+        async function testBackend() {
+            log('Testing backend health...', 'info');
+            try {
+                // Backend health is at /api/formats (not /api/health)
+                const response = await fetch('/api/formats');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                log(`✅ Backend healthy: ${data.data?.length || 0} formats loaded`, 'success');
+                return true;
+            } catch (err) {
+                log(`❌ Backend error: ${err.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testFrontend() {
+            log('Testing frontend assets...', 'info');
+            try {
+                const response = await fetch('/src/main.jsx');
+                const text = await response.text();
+                log(`✅ Frontend assets loading (${text.length} bytes)`, 'success');
+                return true;
+            } catch (err) {
+                log(`❌ Frontend error: ${err.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testReactApp() {
+            log('Testing React app initialization...', 'info');
+            try {
+                // Check if React has loaded
+                const reactDiv = document.getElementById('root');
+                if (!reactDiv) {
+                    log('⚠️  No #root div found - React not initialized', 'warning');
+                    return false;
+                }
+                log('✅ React root div exists', 'success');
+                
+                // Try to detect if React has rendered
+                setTimeout(() => {
+                    if (reactDiv.children.length > 0) {
+                        log('✅ React has rendered content', 'success');
+                    } else {
+                        log('⚠️  React root is empty - app may have failed to render', 'warning');
+                    }
+                }, 2000);
+                return true;
+            } catch (err) {
+                log(`❌ React error: ${err.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testAIChat() {
+            log('Testing AI chat endpoint...', 'info');
+            try {
+                const response = await fetch('/api/ai-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'test',
+                        conversationHistory: [],
+                        currentBrief: {}
+                    })
+                });
+                const data = await response.json();
+                log(`✅ AI Chat responding: "${data.response?.substring(0, 50)}..."`, 'success');
+                log(`   Current Step: ${data.extractedEntities?.currentStep}`, 'info');
+                return true;
+            } catch (err) {
+                log(`❌ AI Chat error: ${err.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function runAllTests() {
+            log('========================================', 'info');
+            log('Starting comprehensive platform test...', 'info');
+            log('========================================', 'info');
+            
+            const results = [];
+            results.push(await testBackend());
+            results.push(await testFrontend());
+            results.push(await testReactApp());
+            results.push(await testAIChat());
+            
+            const passed = results.filter(r => r).length;
+            const total = results.length;
+            
+            log('========================================', 'info');
+            if (passed === total) {
+                log(`✅ ALL TESTS PASSED (${passed}/${total})`, 'success');
+                setStatus(`✅ Platform is working! All ${total} tests passed.`, true);
+            } else {
+                log(`⚠️  SOME TESTS FAILED (${passed}/${total} passed)`, 'warning');
+                setStatus(`⚠️  ${passed} of ${total} tests passed. Check console.`, false);
+            }
+            log('========================================', 'info');
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('Page loaded. Click "RUN ALL TESTS" or test individually.', 'info');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

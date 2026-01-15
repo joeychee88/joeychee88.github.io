@@ -1,0 +1,818 @@
+/**
+ * AI Chat API - OpenAI-powered conversational media planning
+ * Uses GPT-4o-mini for natural, context-aware campaign planning conversations
+ */
+
+import express from 'express';
+import OpenAI from 'openai';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const router = express.Router();
+
+// Load industry playbook data
+let industryPlaybook = null;
+try {
+  const playbookPath = path.join(__dirname, '../../frontend/src/data/verticalPlaybook.json');
+  industryPlaybook = JSON.parse(fs.readFileSync(playbookPath, 'utf8'));
+  console.log('[AI CHAT] Industry playbook loaded successfully');
+} catch (error) {
+  console.warn('[AI CHAT] Could not load industry playbook:', error.message);
+}
+
+/**
+ * Fetch KULT planning data for context-rich recommendations
+ */
+async function fetchKULTData(brief) {
+  try {
+    console.log('[KULT DATA] Fetching planning context...');
+    
+    const [ratesRes, inventoryRes, audienceRes, formatsRes] = await Promise.all([
+      axios.get('http://localhost:5001/api/rates').catch(() => ({ data: { data: [] } })),
+      axios.get('http://localhost:5001/api/inventory').catch(() => ({ data: { data: [] } })),
+      axios.get('http://localhost:5001/api/audience').catch(() => ({ data: { data: [] } })),
+      axios.get('http://localhost:5001/api/formats').catch(() => ({ data: { data: [] } }))
+    ]);
+
+    const rates = ratesRes.data?.data || [];
+    const sites = inventoryRes.data?.data || [];
+    const audiences = audienceRes.data?.data || [];
+    const formats = formatsRes.data?.data || [];
+
+    console.log(`[KULT DATA] Loaded: ${rates.length} rates, ${sites.length} sites, ${audiences.length} audiences`);
+
+    // Get industry-specific playbook recommendations
+    let playbookRecommendations = null;
+    if (industryPlaybook && brief?.industry) {
+      const industry = brief.industry.toLowerCase();
+      
+      // Enhanced industry matching with keywords
+      const industryKeywords = {
+        'beauty': ['beauty', 'perfume', 'cosmetic', 'makeup', 'skincare', 'fragrance'],
+        'automotive_ice': ['automotive', 'car', 'vehicle', 'suv', 'sedan'],
+        'automotive_ev': ['ev', 'electric vehicle', 'electric car'],
+        'property_luxury': ['luxury property', 'luxury home', 'luxury condo'],
+        'property_mid_range': ['property', 'home', 'house', 'condo', 'apartment'],
+        'fmcg': ['fmcg', 'food', 'beverage', 'snack', 'consumer goods'],
+        'finance_insurance': ['finance', 'insurance', 'loan', 'banking'],
+        'telco': ['telco', 'telecom', 'mobile', 'internet plan'],
+        'retail_ecommerce': ['ecommerce', 'retail', 'online shop'],
+        'travel': ['travel', 'tourism', 'hotel', 'vacation'],
+        'f_b': ['restaurant', 'cafe', 'f&b', 'food service']
+      };
+      
+      // Try exact match first
+      let industryKey = Object.keys(industryPlaybook.persona_mapping).find(key =>
+        key.toLowerCase() === industry ||
+        key.toLowerCase().includes(industry) ||
+        industry.includes(key.split('_')[0])
+      );
+      
+      // If no match, try keyword matching
+      if (!industryKey) {
+        for (const [key, keywords] of Object.entries(industryKeywords)) {
+          if (keywords.some(keyword => industry.includes(keyword))) {
+            industryKey = key;
+            break;
+          }
+        }
+      }
+      
+      if (industryKey && industryPlaybook.persona_mapping[industryKey]) {
+        playbookRecommendations = industryPlaybook.persona_mapping[industryKey];
+        console.log('[KULT DATA] Found playbook for industry:', industryKey, '(from:', industry, ')');
+      } else {
+        console.log('[KULT DATA] No playbook found for industry:', industry);
+      }
+    }
+
+    // Calculate platform-specific CPM rates from actual rate cards
+    const platformRates = {};
+    rates.forEach(r => {
+      const platform = r.Platform;
+      const cpmDirect = parseFloat(r['CPM Direct (RM)']) || 0;
+      const cpmPG = parseFloat(r['CPM PG (RM)']) || 0;
+      const cpmPD = parseFloat(r['CPM PD (RM)']) || 0;
+      
+      // Use the best available rate (PD > PG > Direct)
+      const bestRate = cpmPD || cpmPG || cpmDirect;
+      
+      if (platform && bestRate > 0) {
+        platformRates[platform] = {
+          direct: cpmDirect,
+          pg: cpmPG,
+          pd: cpmPD,
+          best: bestRate,
+          type: r['Type of Platform']
+        };
+      }
+    });
+
+    // Calculate average CPM by channel type
+    const ottRates = rates.filter(r => r['Type of Platform']?.includes('OTT')).map(r => parseFloat(r['CPM PD (RM)']) || parseFloat(r['CPM PG (RM)']) || parseFloat(r['CPM Direct (RM)'])).filter(v => v > 0);
+    const socialRates = rates.filter(r => r['Type of Platform']?.includes('Social')).map(r => parseFloat(r['CPM PD (RM)']) || parseFloat(r['CPM PG (RM)']) || parseFloat(r['CPM Direct (RM)'])).filter(v => v > 0);
+    const displayRates = rates.filter(r => r['Type of Platform']?.includes('Display')).map(r => parseFloat(r['CPM PD (RM)']) || parseFloat(r['CPM PG (RM)']) || parseFloat(r['CPM Direct (RM)'])).filter(v => v > 0);
+
+    const avgOTT = ottRates.length > 0 ? Math.round(ottRates.reduce((a, b) => a + b, 0) / ottRates.length) : 30;
+    const avgSocial = socialRates.length > 0 ? Math.round(socialRates.reduce((a, b) => a + b, 0) / socialRates.length) : 15;
+    const avgDisplay = displayRates.length > 0 ? Math.round(displayRates.reduce((a, b) => a + b, 0) / displayRates.length) : 12;
+
+    console.log('[KULT DATA] Platform Rates:', Object.keys(platformRates).length, 'platforms loaded');
+    console.log('[KULT DATA] Channel Averages: OTT=RM', avgOTT, 'Social=RM', avgSocial, 'Display=RM', avgDisplay);
+
+    // Filter and prepare relevant recommendations based on brief
+    const context = {
+      topSites: sites.slice(0, 10).map(s => ({
+        name: s.site,
+        category: s.category,
+        monthlyTraffic: s.monthlyTraffic,
+        geo: s.geo
+      })),
+      topAudiences: audiences.slice(0, 8).map(a => {
+        // Calculate total audience across all states
+        const stateKeys = Object.keys(a).filter(k => k !== 'id' && k !== 'Personas' && k !== 'Category');
+        const total = stateKeys.reduce((sum, state) => {
+          const value = a[state];
+          const numValue = typeof value === 'string' ? parseInt(value.replace(/,/g, '')) : (value || 0);
+          return sum + numValue;
+        }, 0);
+        
+        return {
+          name: a.Personas,
+          size: total,
+          description: a.description || ''
+        };
+      }),
+      platformRates,
+      channelRates: {
+        ott: avgOTT,
+        social: avgSocial,
+        display: avgDisplay
+      },
+      availableFormats: formats.slice(0, 5).map(f => f.name),
+      industryPlaybook: playbookRecommendations
+    };
+
+    return context;
+  } catch (error) {
+    console.error('[KULT DATA ERROR]:', error.message);
+    return null;
+  }
+}
+
+// Initialize OpenAI client
+const openai = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'dummy-key-for-dev'
+  ? new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      baseURL: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
+    })
+  : null;
+
+/**
+ * System prompt for AI media strategist
+ */
+const SYSTEM_PROMPT = `You are a SENIOR MEDIA STRATEGIST for KULT Planning Engine, helping clients plan effective digital media campaigns in Malaysia.
+
+CRITICAL RULE - NEVER USE EMOJIS IN YOUR RESPONSES:
+- Do not include any emojis in the "response" field
+- Use plain text only
+- Be professional and conversational without emojis
+
+CRITICAL RESTRICTIONS - STAY ON TOPIC:
+You MUST ONLY discuss topics related to:
+- Media campaign planning and strategy
+- Advertising budgets and allocations
+- Target audiences and demographics
+- Digital marketing channels (OTT, Social, Display, Search)
+- Campaign objectives and KPIs
+- Malaysian media landscape
+- Industry-specific marketing strategies
+
+You MUST REFUSE and politely decline:
+- General knowledge questions (history, science, math, etc.)
+- Personal advice (relationships, health, legal, financial planning)
+- Coding or technical help (programming, debugging)
+- Creative writing or content generation unrelated to campaigns
+- Translation services
+- Any topic not directly related to media campaign planning
+
+If user asks off-topic questions, respond with:
+"I'm specialized in media campaign planning for the Malaysian market. I can help you with campaign strategy, budget allocation, audience targeting, and channel recommendations. Could you tell me about the campaign you'd like to plan?"
+
+IMPORTANT: Always respond with valid JSON in this format:
+{
+  "response": "your conversational response here",
+  "extractedEntities": {
+    "campaignName": "value or null",
+    "product_brand": "value or null",
+    "campaign_objective": "Awareness/Traffic/Engagement/Conversion or null",
+    "industry": "value or null",
+    "budget_rm": number or null,
+
+CRITICAL: The "response" field must ONLY contain natural conversational text for the user
+- NEVER include JSON, brackets {}, field names, or metadata in the "response" field
+- DO NOT write "response: ..." or show internal structure
+- ONLY write what the user should see as your reply
+- DO NOT use emojis in responses
+    "geography": "value or null",
+    "geography_specificity": "nationwide/klang_valley/major_cities/specific_regions or null",
+    "duration_weeks": number or null,
+    "targetAudience": "value or null",
+    "channel_preference": "OTT/Social/Display/Balanced or null",
+    "priority": "Max Reach/Performance or null",
+    "creative_assets": "video/static/both/none or null",
+    "buying_preference": "direct/programmatic/mixed or null"
+  }
+}
+
+Your role as a COLLABORATIVE MEDIA PLANNING PARTNER:
+- Work WITH the user to build their campaign plan step-by-step
+- Be conversational, friendly, and consultative
+- **ASK QUESTIONS** to understand their preferences, not just extract data
+- Help them make informed decisions by explaining trade-offs
+- Build the plan incrementally, getting buy-in at each stage
+- Suggest options and explain WHY, then let them choose
+
+NATURAL CONVERSATION APPROACH:
+--------------------------------------------------------------
+**CRITICAL: Have a natural conversation, NOT a question checklist**
+**CRITICAL: Do not use emojis in your responses**
+
+When user first mentions their campaign:
+1. Acknowledge what they said
+2. Ask about the MOST IMPORTANT missing piece (usually budget)
+3. Generate plan as soon as you have enough info
+
+**Essential Info (gather naturally):**
+- Product/brand
+- Campaign goal (awareness/traffic/engagement/conversion) 
+- Budget (ALWAYS ask if not provided)
+- Geography (default: Malaysia, ask only if they mention regions)
+- Duration (default: 4 weeks, ask only if critical)
+
+**When to ASK vs ASSUME:**
+ALWAYS ASK: Budget (critical for recommendations)
+ASK IF AFFECTS PLAN: Campaign objective, specific geography
+DON'T ASK: Creative assets, duration, buying type, devices (use smart defaults)
+
+**Example Flow:**
+User: "Launch new car"
+AI: "Exciting! Car launches work best with awareness-focused campaigns. What's your budget?
+     - RM 50k-100k (focused reach)
+     - RM 100k-200k (strong impact)  
+     - RM 200k+ (comprehensive coverage)"
+
+User: "RM 150k"
+AI: "Perfect! Here's your automotive launch plan:
+
+**MEDIA MIX:**
+• OTT Video 50% (RM 75k) - YouTube, Astro GO for high-impact storytelling
+• Social 35% (RM 52.5k) - Meta, TikTok for reach & frequency
+• Display 15% (RM 22.5k) - Extended touchpoints
+
+**AUDIENCE:** Automotive Enthusiasts, Emerging Affluents, Gadget Gurus
+**DURATION:** 6 weeks (standard for launches)
+**GEOGRAPHY:** Malaysia-wide
+
+**EXPECTED RESULTS:**
+• ~3.5M impressions
+• 800K-1.2M reach
+• Premium placements for brand credibility
+
+Want to adjust anything?"
+
+ CONVERSATIONAL STYLE:
+- Ask "Which of these audiences resonates with your brand?" not "Select target audience"
+- Explain "Interactive ads drive 2-3x engagement" not just "Use interactive ads"
+- Present options: "We could go heavy on video (60%) or balanced (40/40/20). What feels right?"
+- Get confirmation: "Does this approach align with your goals?"
+- Be a partner: "Let's refine this together" not "Here's your plan"
+
+ FORMAT SELECTION QUESTIONS:
+When discussing ad formats, ask engaging questions like:
+- "Would interactive formats (Quiz, Storytelling, Carousel) help with engagement?"
+- "Do you have video assets, or should we focus on display banners?"
+- "For a premium brand, High Impact formats (Skinner, Masthead) could create impact - interested?"
+- "Social video (Stories, Reels) performs well for FMCG - worth including?"
+
+ AUDIENCE SELECTION QUESTIONS:
+Present personas with context and ask for preferences:
+- "We have audience segments available. For beauty, I'd highlight: Fashion Icons, Youth Mom, Young Working Adult. Which 2-3 feel most relevant?"
+- "Your product appeals to both Emerging Affluents and Family Dynamic. Should we focus on one or cover both?"
+- "Klang Valley has ~40% of each audience. Want to start there or go nationwide?"
+
+IMPORTANT - ACTUAL AVAILABLE PERSONAS (USE ONLY THESE):
+Active Lifestyle Seekers, Adventure Enthusiasts, Automotive Enthusiasts, Automotive Intent, 
+Business & Professional, Corporate Visionaries, EPL Fans, Emerging Affluents, Esports Fans, 
+Family Dynamic, Fashion Icons, Foodies, Gadget Gurus, Health & Wellness Shoppers, Home Buyers, 
+Luxury Buyers, Luxury Seekers, Online Shoppers, SME, Start-ups, Students, 
+Tech & Gadget Enthusiasts, Travel Seekers, Young Working Adult, Youth Mom
+
+NEVER mention: "Young Moms", "Young Dads", "Beauty Enthusiasts" (these don't exist in our database)
+
+ CHANNEL MIX QUESTIONS:
+Build the strategy collaboratively:
+- "For RM 150k with video assets, I'd suggest: OTT (RM 60k for impact), Social (RM 50k for reach), Display (RM 40k for frequency). Does this feel balanced?"
+- "We could go aggressive on one channel or spread across three. What's your instinct?"
+- "YouTube is cost-efficient at RM 22 CPM vs Astro GO at RM 48 CPM, but Astro has premium context. Which matters more?"
+
+ Conversation Flow (NATURAL & FLEXIBLE):
+
+User shares campaign → You ask about BUDGET (if not provided) → Generate full plan
+
+**That's it. Keep it simple.**
+
+Example Conversation:
+User: "I want to launch a new perfume"
+AI: "Exciting! Perfume launches typically focus on awareness and aspiration. What's your budget for this campaign?"
+
+User: "RM 80k"
+AI: "Perfect budget for a focused perfume launch! Here's your plan:
+
+**MEDIA MIX:**
+• Social 50% (RM 40k) - Instagram, Facebook Stories for visual storytelling
+• Display 30% (RM 24k) - Premium lifestyle sites for brand context
+• OTT 20% (RM 16k) - YouTube for reach extension
+
+**AUDIENCE:** Fashion Icons, Youth Mom, Young Working Adult
+**DURATION:** 4 weeks
+**GEOGRAPHY:** Malaysia-wide, with 40% concentrated in Klang Valley
+
+**EXPECTED RESULTS:**
+• 2.8M impressions
+• 650K-900K reach
+• Strong presence in beauty & lifestyle content
+
+Want to refine anything? I can adjust budget splits, change audiences, or modify duration."
+
+Example Good Flow:
+User: "I want to launch a new perfume"
+AI: "Exciting! Before I create a strategic plan, I need to understand your creative assets. What do you have or plan to create? (video / static banners / both / none yet)"
+
+Example Bad Flow (DON'T DO THIS):
+User: "I want to launch a new perfume"
+AI: "For a new perfume launch, I recommend OTT at RM 40k, Social at RM 40k..."  TOO SOON!
+
+Strategic Response Framework:
+1. **Context First**: Ask about creative assets, duration, geography specificity, buying preference BEFORE recommending
+2. **Strategic Rationale**: For each channel, explain Role in funnel, Why suits objective, Why matches audience
+3. **Realistic Metrics**: Use frequency-adjusted reach (e.g., "Reach: ~500K-700K people based on 3-4x frequency")
+4. **Planning Assumptions**: State assumptions (geography, duration, buying type, creative)
+5. **Next Steps**: End with a question to refine
+
+Output Structure (ALWAYS include ALL sections):
+- Campaign Summary (objective, budget, geography, duration)
+- Strategic Approach (2-3 sentences)
+- Channel Mix & Rationale (Channel, Budget, Role, Rationale)
+- Expected Performance (Impressions, Reach range with frequency, CTR range)
+- **Assumptions & Notes** (REQUIRED - list 3-5 assumptions about the plan):
+  • Geography coverage (e.g., "Nationwide reach across all Malaysian states")
+  • Campaign duration (e.g., "4-week campaign period assumed")
+  • Creative assets (e.g., "Video assets available for OTT/YouTube channels")
+  • Buying type (e.g., "Direct publisher buying for guaranteed impressions")
+  • Frequency planning (e.g., "Targeting 3-4 exposures per unique user")
+  • Budget flexibility (e.g., "Budget can be adjusted based on performance")
+- Next Step Prompt (Ask a follow-up question to refine the plan)
+
+Constraints:
+- NEVER say "Total Estimated Reach" for summed impressions
+- Use "Estimated Impressions" and "Indicative Reach Range"
+- Reach must be frequency-adjusted and capped by audience size
+- For Awareness >5 audiences: "Consider consolidating to 3-5 core personas to avoid frequency dilution"
+
+Campaign Planning Framework:
+1. **Campaign Objectives**: Awareness, Traffic, Engagement, Conversion
+2. **Industries**: FMCG, Retail, Automotive, Property, Banking, Tech, Healthcare, Education
+3. **Channels**: OTT (Video), Social (Display), Programmatic Display, Search
+4. **Geography**: Focus on Malaysian regions (Klang Valley, Penang, Johor, etc.)
+5. **Budget Ranges**: 
+   - Small: RM 30k-80k (local/test campaigns)
+   - Medium: RM 80k-200k (standard launches)
+   - Large: RM 200k+ (major brand campaigns)
+
+Conversation Guidelines:
+- Start warm and consultative
+- Infer information from context (don't ask redundant questions)
+- If user is unsure about budget, suggest 2-3 tiers with expected reach
+- Extract entities naturally without interrogating
+- Use Malaysian context (RM currency, local geography, cultural events)
+- Keep responses under 150 words unless explaining budget scenarios
+
+ CRITICAL INSTRUCTION - CPM RATES 
+You MUST ALWAYS use the PLATFORM-SPECIFIC CPM RATES provided in the KULT DATABASE context.
+
+NEVER use generic/average rates in your recommendations.
+
+When KULT platform rates are provided, you MUST:
+1.  USE PLATFORM-SPECIFIC CPM: "Astro GO at RM 48 CPM", "Sooka at RM 44 CPM", "YouTube at RM 22 CPM"
+2.  DON'T USE GENERIC: Never say "OTT at RM 25 CPM" or "Social at RM 15 CPM"
+3.  Reference specific publisher names (e.g., "Astro GO", "Sooka", "Meta")
+4.  Mention actual audience segments with sizes (e.g., "Automotive Enthusiasts (1.2M users)")
+5.  Calculate expected impressions: (Budget / CPM) × 1000
+6.  Use industry playbook personas if provided
+7.  Be specific and data-driven, not generic
+
+ CRITICAL INSTRUCTION - AUDIENCE TARGETING 
+When recommending audiences:
+1.  USE MULTIPLE PERSONAS: Recommend 2-3 relevant audience segments from the playbook primary personas
+2.  DON'T USE ONLY ONE: Never recommend just "Automotive Enthusiasts" - include "Automotive Intent", "Gadget Gurus", etc.
+3.  USE EXACT AUDIENCE SIZES FROM DATABASE: NEVER invent or estimate audience sizes!
+   - Find the persona in the "TOP AUDIENCE SEGMENTS" list above
+   - Use the EXACT size shown (e.g., "2.84M users", "1.52M users")
+   - If geography is specified, apply the multiplier to the database size
+4.  ADJUST FOR GEOGRAPHY: Apply geographic multipliers to the DATABASE audience sizes:
+   - East Malaysia (Sabah/Sarawak): ~15% of national audience
+   - West Malaysia (Peninsular): ~85% of national audience
+   - Klang Valley: ~40% of national audience
+   - Northern Region (Penang/Kedah/Perlis): ~15% of national audience
+   - Southern Region (Johor): ~15% of national audience
+
+ NEVER HALLUCINATE AUDIENCE SIZES! 
+ WRONG: "Automotive Enthusiasts (480K users in Klang Valley)" if database shows different number
+ CORRECT: Look up the persona's national size in the database, then apply 40% multiplier for Klang Valley
+
+Example Geography Adjustment:
+- Database shows: "Automotive Enthusiasts - 2.84M users"
+- National: "Automotive Enthusiasts (2.84M users nationally)"
+- East Malaysia: "Automotive Enthusiasts (~426K users in East Malaysia)" [2.84M × 15%]
+- Klang Valley: "Automotive Enthusiasts (~1.14M users in Klang Valley)" [2.84M × 40%]
+
+EXAMPLE - CORRECT APPROACH:
+"With RM 150k for an automotive launch, I recommend:
+- **OTT (RM 80k)**: 
+  • Astro GO targeting Automotive Enthusiasts at RM 48 CPM = 1.67M impressions
+  • YouTube Channels at RM 22 CPM = 1.82M impressions
+- **Social (RM 40k)**: Meta (Facebook/Instagram) at RM 9 CPM = 4.44M impressions
+- **Display (RM 30k)**: KULT Display Network at RM 6 CPM = 5M impressions
+Total estimated reach: 12.93M impressions"
+
+EXAMPLE - WRONG APPROACH (Don't do this):
+ "OTT at RM 25 CPM" ← WRONG! Use specific platforms
+ "Social at RM 15 CPM" ← WRONG! Use actual Meta rate (RM 9)
+ "Display at RM 8 CPM" ← WRONG! Use actual Display Network rate (RM 6)
+
+Entity Extraction Rules:
+- Extract entities naturally from conversation
+- Only include fields you're confident about
+- Use null for missing information
+- Convert budget text to numbers (e.g., "RM 80k" → 80000)
+- Infer industry from product context when obvious:
+  • Perfume, cosmetics, skincare, makeup → "Beauty"
+  • Car, SUV, vehicle, automotive → "Automotive"
+  • Property, house, apartment → "Property"
+  • Food products, beverages, snacks → "FMCG"
+  • Bank, insurance, loan → "Finance"
+  • Phone plan, internet, telco → "Telco"
+- Default campaign_objective to "Awareness" for launches
+- Extract geography as string (e.g., "Kuala Lumpur", "Klang Valley", "Malaysia")
+
+When user provides sufficient information (product, objective, budget, geography), suggest moving to plan generation.
+
+Always respond with valid JSON. Be conversational, consultative, and helpful.`;
+
+/**
+ * POST /api/ai-chat
+ * Process user message and generate AI response with entity extraction
+ */
+router.post('/', async (req, res) => {
+  try {
+    const { message, conversationHistory, currentBrief } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Message is required' 
+      });
+    }
+
+    // Pre-filter obviously off-topic queries to save API costs
+    const lowerMessage = message.toLowerCase();
+    const offTopicKeywords = [
+      'weather', 'recipe', 'cook', 'movie', 'song', 'lyrics',
+      'translate', 'translation', 'what is the capital', 'who is',
+      'write code', 'debug', 'programming', 'python', 'javascript',
+      'math problem', 'solve equation', 'calculate', 'homework',
+      'joke', 'story', 'poem', 'essay',
+      'health advice', 'medical', 'legal advice', 'lawyer',
+      'relationship', 'dating', 'love advice'
+    ];
+
+    const isOffTopic = offTopicKeywords.some(keyword => 
+      lowerMessage.includes(keyword) && 
+      !lowerMessage.match(/campaign|advertis|market|media|budget|audience|brand|launch|promo/i)
+    );
+
+    if (isOffTopic) {
+      console.log('[AI CHAT] Off-topic query detected:', message);
+      return res.json({
+        success: true,
+        response: "I'm specialized in media campaign planning for the Malaysian market. I can help you with campaign strategy, budget allocation, audience targeting, and channel recommendations. Could you tell me about the campaign you'd like to plan?",
+        extractedEntities: {},
+        metadata: {
+          method: 'filtered',
+          reason: 'Off-topic query detected'
+        }
+      });
+    }
+
+    // Check if OpenAI is available
+    if (!openai) {
+      console.warn('[AI CHAT] OpenAI not configured - using fallback');
+      return res.json({
+        success: true,
+        response: "I'm currently in demo mode. To enable full AI conversations, please configure your OpenAI API key. For now, I can help you build a media plan - just tell me about your campaign!",
+        extractedEntities: {},
+        metadata: {
+          method: 'fallback',
+          reason: 'OpenAI API key not configured'
+        }
+      });
+    }
+
+    console.log('[AI CHAT] Processing message:', message.substring(0, 50) + '...');
+    console.log('[AI CHAT] Current brief:', currentBrief);
+
+    // Fetch KULT planning data for context-rich recommendations
+    const kultData = await fetchKULTData(currentBrief);
+
+    // Build conversation history for context
+    const messages = [
+      { role: 'system', content: SYSTEM_PROMPT }
+    ];
+
+    // Add KULT data context if available
+    if (kultData) {
+      // Build platform-specific rates list with PROMINENT formatting
+      const platformRatesList = Object.entries(kultData.platformRates || {}).slice(0, 12).map(([platform, rates]) => 
+        `  • **${platform}**: RM ${rates.best} CPM (${rates.type})`
+      ).join('\n');
+
+      let kultContext = `
+
+ KULT PLANNING DATABASE - USE THIS DATA IN YOUR RESPONSE
+
+
+   PLATFORM-SPECIFIC CPM RATES - ALWAYS USE THESE!   
+${platformRatesList}
+
+ IMPRESSION CALCULATION:
+Impressions = (Budget in RM / Platform CPM) × 1,000
+
+EXAMPLE:
+- RM 48,000 budget on Astro GO (RM 48 CPM) = (48,000 / 48) × 1,000 = 1,000,000 impressions
+- RM 45,000 budget on Meta (RM 9 CPM) = (45,000 / 9) × 1,000 = 5,000,000 impressions
+
+ TOP PUBLISHERS/SITES:
+${kultData.topSites.slice(0, 8).map((s, i) => `${i + 1}. ${s.name} - ${s.category} (${s.geo}) - ${(s.monthlyTraffic / 1000000).toFixed(1)}M monthly users`).join('\n')}
+
+ TOP AUDIENCE SEGMENTS:
+${kultData.topAudiences.slice(0, 8).map((a, i) => `${i + 1}. ${a.name} - ${(a.size / 1000000).toFixed(2)}M users`).join('\n')}
+
+ COMPLETE VALID PERSONA LIST (ONLY USE THESE - NEVER INVENT OTHERS):
+Active Lifestyle Seekers, Adventure Enthusiasts, Automotive Enthusiasts, Automotive Intent, 
+Business & Professional, Corporate Visionaries, EPL Fans, Emerging Affluents, Entertainment, 
+Esports Fans, Family Dynamic, Fashion Icons, Foodies, Gadget Gurus, Health & Wellness Shoppers, 
+Home Buyers, Luxury Buyers, Luxury Seekers, Online Shoppers, Romantic Comedy, SME, Start-ups, 
+Students, Tech & Gadget Enthusiasts, Travel Seekers, Young Working Adult, Youth Mom
+
+ NEVER MENTION THESE (THEY DON'T EXIST):
+"Young Moms", "Young Dads", "Beauty Enthusiasts", "Early Adopters", "Mass Market", 
+"Tech Enthusiasts" (use "Tech & Gadget Enthusiasts" instead)
+
+ AD FORMATS:
+${kultData.availableFormats.slice(0, 8).join(', ')}`;
+
+      // Add industry-specific playbook recommendations
+      if (kultData.industryPlaybook) {
+        kultContext += `\n\n INDUSTRY-SPECIFIC PLAYBOOK (${currentBrief?.industry || 'Industry'} Strategy):
+
+ Primary Audience Personas (USE 2-3 OF THESE):
+  ${kultData.industryPlaybook.primary_personas.map(p => `• ${p}`).join('\n  ')}
+
+ IMPORTANT: Recommend MULTIPLE personas, not just one! Example:
+    CORRECT: "Targeting Automotive Enthusiasts, Automotive Intent, and Gadget Gurus"
+    WRONG: "Targeting Automotive Enthusiasts only"
+
+ Recommended Publishers/IPs:
+  ${kultData.industryPlaybook.key_ips.map(ip => `• ${ip}`).join('\n  ')}`;
+        
+        if (kultData.industryPlaybook.watchouts && kultData.industryPlaybook.watchouts.length > 0) {
+          kultContext += `\n\n Strategy Watchouts:
+  ${kultData.industryPlaybook.watchouts.map(w => `• ${w}`).join('\n  ')}`;
+        }
+      }
+
+      // Add geography multipliers if geography is specified
+      // Handle both string and array geography formats
+      let geography = '';
+      if (currentBrief?.geography) {
+        if (Array.isArray(currentBrief.geography)) {
+          geography = currentBrief.geography.join(', ').toLowerCase();
+        } else if (typeof currentBrief.geography === 'string') {
+          geography = currentBrief.geography.toLowerCase();
+        }
+      }
+      if (geography) {
+        kultContext += `\n\n TARGET GEOGRAPHY: ${geography}`;
+        
+        if (geography.includes('klang valley') || geography.includes('kuala lumpur') || geography.includes('selangor') ||
+            geography.includes('east malaysia') || geography.includes('sabah') || geography.includes('sarawak') ||
+            geography.includes('penang') || geography.includes('kedah') || geography.includes('perlis') || 
+            geography.includes('johor')) {
+          kultContext += `\n\n REGIONAL TARGETING INSTRUCTION:
+Since you're targeting a specific region (not nationwide), ALWAYS state audience sizes as "nationally" 
+and clarify that actual regional reach will be proportionally smaller.
+
+ CORRECT approach:
+"Targeting Automotive Enthusiasts (1.80M users nationally, concentrated in ${geography})"
+
+ WRONG approach:
+"Targeting Automotive Enthusiasts (720K users in Klang Valley)" ← Don't calculate regional sizes!
+
+The multipliers are approximations and vary by persona. It's more accurate to reference 
+national sizes and let the client know the campaign will focus on the target geography.`;
+        }
+      }
+
+      kultContext += `\n\n
+ MANDATORY: Your response MUST include:
+1. Specific publisher names from the list above
+2. MULTIPLE audience segments (2-3 personas) with geography-adjusted user counts
+3. CPM rates and calculated impressions per platform
+4. Budget breakdown across channels
+5. Industry playbook personas (if provided)
+
+ ANTI-HALLUCINATION RULES - READ CAREFULLY:
+1. NEVER invent audience sizes! Use ONLY the numbers from "TOP AUDIENCE SEGMENTS" above
+2. When mentioning audience segments, ALWAYS use the format: "Persona Name (X.XXM users nationally)"
+3. NEVER say things like "1.14M users in Klang Valley" or "480K users in East Malaysia"
+4. The audience data provided above shows NATIONAL totals - always label them as "nationally"!
+
+EXAMPLES:
+ CORRECT: "Automotive Enthusiasts (1.80M users nationally, focused on Klang Valley)"
+ WRONG: "Automotive Enthusiasts (720K users in Klang Valley)"
+ CORRECT: "Gadget Gurus (1.56M users nationally, concentrated in Klang Valley)"
+ WRONG: "Gadget Gurus (1.14M users in Klang Valley)"
+
+ QUALITY CHECKS:
+- Did you recommend 2-3 different audience segments? (Not just one!)
+- Did you calculate regional sizes from the ACTUAL national sizes shown above?
+- Did you use platform-specific CPM rates? (Not generic averages!)
+- Did you mention specific publishers by name?
+- Do your audience numbers match the calculation formula?
+
+ DO NOT give generic advice like "consider OTT platforms"
+ DO NOT say "480K in Klang Valley" if the national size is 1.80M (should be 720K!)
+ DO give specific recommendations like "Astro GO at RM 48 CPM = 1M impressions"
+ DO use correct calculations: "Automotive Enthusiasts (1.80M nationally → ~720K in Klang Valley)"
+`;
+      
+      messages.push({
+        role: 'system',
+        content: kultContext
+      });
+      
+      console.log('[AI CHAT] Added KULT data context');
+    }
+
+    // Add conversation history (last 10 messages for context)
+    if (conversationHistory && Array.isArray(conversationHistory)) {
+      const recentHistory = conversationHistory.slice(-10);
+      messages.push(...recentHistory.map(msg => ({
+        role: msg.role === 'assistant' ? 'assistant' : 'user',
+        content: msg.content
+      })));
+    }
+
+    // Add current brief context
+    if (currentBrief && Object.keys(currentBrief).length > 0) {
+      const briefSummary = Object.entries(currentBrief)
+        .filter(([key, value]) => value && !key.startsWith('_'))
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', ');
+      
+      if (briefSummary) {
+        messages.push({
+          role: 'system',
+          content: `Current campaign brief: ${briefSummary}`
+        });
+      }
+    }
+
+    // Add user's new message
+    messages.push({
+      role: 'user',
+      content: message
+    });
+
+    console.log('[AI CHAT] Calling OpenAI with', messages.length, 'messages');
+
+    // Call OpenAI API
+    const startTime = Date.now();
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: messages,
+      temperature: 0.7, // Slightly creative but consistent
+      max_tokens: 500, // Keep responses concise
+      response_format: { type: 'json_object' }, // Request structured output
+    });
+
+    const elapsed = Date.now() - startTime;
+    console.log(`[AI CHAT] OpenAI response received in ${elapsed}ms`);
+    console.log('[AI CHAT] Tokens used:', completion.usage?.total_tokens || 'N/A');
+
+    // Parse AI response
+    let aiResponse;
+    try {
+      aiResponse = JSON.parse(completion.choices[0].message.content);
+    } catch (parseError) {
+      // Fallback if JSON parsing fails
+      aiResponse = {
+        response: completion.choices[0].message.content,
+        extractedEntities: {}
+      };
+    }
+
+    // Ensure we have the required fields
+    const response = {
+      success: true,
+      response: aiResponse.response || aiResponse.message || completion.choices[0].message.content,
+      extractedEntities: aiResponse.extractedEntities || aiResponse.entities || {},
+      metadata: {
+        method: 'openai',
+        model: 'gpt-4o-mini',
+        responseTime: elapsed,
+        tokensUsed: completion.usage?.total_tokens || 0
+      }
+    };
+
+    console.log('[AI CHAT] Extracted entities:', response.extractedEntities);
+    console.log('[AI CHAT] Response length:', response.response.length, 'chars');
+
+    res.json(response);
+
+  } catch (error) {
+    console.error('[AI CHAT ERROR]:', error);
+    
+    // Provide helpful fallback
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate AI response',
+      details: error.message,
+      fallbackResponse: "I'm having trouble processing your request right now. Could you try rephrasing or let me know what you'd like to plan?"
+    });
+  }
+});
+
+/**
+ * POST /api/ai-chat/feedback
+ * Store user feedback (thumbs up/down) for AI responses
+ * This data can be used for:
+ * - Model fine-tuning
+ * - Prompt engineering improvements
+ * - Quality monitoring
+ */
+router.post('/feedback', async (req, res) => {
+  try {
+    const { conversationId, messageIndex, messageContent, feedback, context } = req.body;
+    
+    // Create feedback log entry
+    const feedbackEntry = {
+      conversationId,
+      messageIndex,
+      messageContent: messageContent.substring(0, 500), // Truncate for storage
+      feedback, // 'like' or 'dislike'
+      context: {
+        objective: context?.brief?.campaign_objective || 'unknown',
+        industry: context?.brief?.industry || 'unknown',
+        budget: context?.brief?.budget_rm || 0
+      },
+      timestamp: new Date().toISOString()
+    };
+    
+    // Store feedback (append to log file)
+    const feedbackDir = path.join(__dirname, '../data/feedback');
+    if (!fs.existsSync(feedbackDir)) {
+      fs.mkdirSync(feedbackDir, { recursive: true });
+    }
+    
+    const today = new Date().toISOString().split('T')[0];
+    const feedbackFile = path.join(feedbackDir, `feedback-${today}.jsonl`);
+    
+    fs.appendFileSync(feedbackFile, JSON.stringify(feedbackEntry) + '\n');
+    
+    console.log(`[AI FEEDBACK] ${feedback} for message ${messageIndex} in conversation ${conversationId}`);
+    
+    res.json({ success: true, message: 'Feedback recorded' });
+  } catch (error) {
+    console.error('[AI FEEDBACK] Error storing feedback:', error);
+    res.status(500).json({ success: false, error: 'Failed to record feedback' });
+  }
+});
+
+export default router;

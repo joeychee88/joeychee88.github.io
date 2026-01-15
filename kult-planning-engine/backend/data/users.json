@@ -1,0 +1,103 @@
+[
+  {
+    "id": 1,
+    "email": "admin@kult.my",
+    "name": "System Admin (Test Edit)",
+    "phone": "",
+    "role": "system_admin",
+    "organizationId": null,
+    "assignedSalesPersonId": null,
+    "status": "active",
+    "lastLoginAt": "2026-01-15T05:43:06.344Z",
+    "createdAt": "2024-12-26T00:00:00.000Z",
+    "metadata": {
+      "jobTitle": "",
+      "department": ""
+    },
+    "updatedAt": "2026-01-15T05:43:06.345Z"
+  },
+  {
+    "id": 2,
+    "email": "sarah.tan@kult.my",
+    "name": "Sarah Tan",
+    "phone": "",
+    "role": "sales_person",
+    "organizationId": null,
+    "assignedSalesPersonId": null,
+    "status": "inactive",
+    "lastLoginAt": null,
+    "createdAt": "2024-12-26T00:00:00.000Z",
+    "metadata": {
+      "jobTitle": "Sales Manager",
+      "department": "Sales"
+    },
+    "updatedAt": "2025-12-27T15:30:02.948Z"
+  },
+  {
+    "id": 3,
+    "email": "clientadmin@test.com",
+    "name": "Client Admin",
+    "phone": "",
+    "role": "client_admin",
+    "organizationId": "org_63c7ed9b408d4d9e",
+    "assignedSalesPersonId": "sales_default_001",
+    "status": "active",
+    "lastLoginAt": null,
+    "createdAt": "2024-12-26T00:00:00.000Z",
+    "metadata": {
+      "jobTitle": "Marketing Director",
+      "department": "Marketing"
+    },
+    "updatedAt": "2025-12-27T17:02:24.542Z"
+  },
+  {
+    "id": 4,
+    "email": "teammember@test.com",
+    "name": "Team Member",
+    "phone": "",
+    "role": "client_admin",
+    "organizationId": 1,
+    "assignedSalesPersonId": 2,
+    "status": "active",
+    "lastLoginAt": null,
+    "createdAt": "2024-12-26T00:00:00.000Z",
+    "metadata": {
+      "jobTitle": "Marketing Coordinator",
+      "department": "Marketing"
+    },
+    "updatedAt": "2025-12-27T15:30:08.189Z"
+  },
+  {
+    "id": "user_149079ff412e1d90",
+    "email": "johndoe999@test.com",
+    "name": "John Doe",
+    "phone": "",
+    "role": "client_user",
+    "organizationId": null,
+    "assignedSalesPersonId": null,
+    "status": "active",
+    "lastLoginAt": null,
+    "createdAt": "2025-12-26T13:32:40.495Z",
+    "metadata": {
+      "jobTitle": "",
+      "department": ""
+    }
+  },
+  {
+    "id": "user_30a18e06ec29fb20",
+    "email": "joey_chee@kult.my",
+    "name": "Joey Chee",
+    "phone": "",
+    "role": "system_admin",
+    "organizationId": "org_c77b9f570358bca6",
+    "assignedSalesPersonId": null,
+    "status": "active",
+    "lastLoginAt": null,
+    "createdAt": "2025-12-28T12:43:32.930Z",
+    "metadata": {
+      "jobTitle": "",
+      "department": ""
+    },
+    "password": "kult2024"
+  }
+]

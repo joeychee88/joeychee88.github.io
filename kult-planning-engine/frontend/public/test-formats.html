@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Format API Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0f0f0f; color: #fff; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        pre { background: #1a1a1a; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Format API Test Page</h1>
+    <p>This page tests if the frontend can fetch formats from the backend.</p>
+    
+    <h2>Test Results:</h2>
+    <div id="results">Testing...</div>
+    
+    <script>
+        async function testFormats() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                resultsDiv.innerHTML = '<p>⏳ Fetching /api/formats...</p>';
+                
+                const response = await fetch('/api/formats');
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    const formats = data.data;
+                    resultsDiv.innerHTML = `
+                        <p class="success">✅ SUCCESS! Fetched ${formats.length} formats</p>
+                        <h3>Sample Formats:</h3>
+                        <pre>${JSON.stringify(formats.slice(0, 5), null, 2)}</pre>
+                        <h3>Format IDs:</h3>
+                        <p>${formats.slice(0, 10).map(f => f.id).join(', ')}</p>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<p class="error">❌ API returned success=false</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        testFormats();
+    </script>
+</body>
+</html>

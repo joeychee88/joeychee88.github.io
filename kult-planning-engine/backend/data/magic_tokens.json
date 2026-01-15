@@ -1,0 +1,79 @@
+[
+  {
+    "id": "token_d28877528eda8565",
+    "userId": "user_e90a2c78fa339316",
+    "token": "c63c4cad5220d3805ccc00522e21600df5151317b2510d631158a9fc95337bbb",
+    "expiresAt": "2025-12-26T09:51:24.889Z",
+    "used": false,
+    "usedAt": null,
+    "ipAddress": "127.0.0.1",
+    "userAgent": "curl/7.88.1",
+    "createdAt": "2025-12-26T09:36:24.889Z"
+  },
+  {
+    "id": "token_eb8619812473d5b4",
+    "userId": "user_30a18e06ec29fb20",
+    "token": "3d93b3dc2fdf89cfb258c3065ba2a916469850ca569a8e5b7e34a74f84cb1613",
+    "expiresAt": "2025-12-28T13:53:21.865Z",
+    "used": false,
+    "usedAt": null,
+    "ipAddress": "127.0.0.1",
+    "userAgent": "curl/7.88.1",
+    "createdAt": "2025-12-28T13:38:21.865Z"
+  },
+  {
+    "id": "token_d63869518d10ac03",
+    "userId": "user_30a18e06ec29fb20",
+    "token": "e6fee658a5fb807d4c7ab608f2105944d7acc4caa4f0a62ebb2d8ad8195a1689",
+    "expiresAt": "2025-12-28T13:59:51.525Z",
+    "used": false,
+    "usedAt": null,
+    "ipAddress": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "createdAt": "2025-12-28T13:44:51.525Z"
+  },
+  {
+    "id": "token_9d7aade9981c643b",
+    "userId": 1,
+    "token": "46810fea33a02953c713fb359c8063d18d4d106c34b88a7a33ee66b9e400c524",
+    "expiresAt": "2025-12-28T14:01:35.453Z",
+    "used": false,
+    "usedAt": null,
+    "ipAddress": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "createdAt": "2025-12-28T13:46:35.453Z"
+  },
+  {
+    "id": "token_5ed66fb6a0ec3148",
+    "userId": 1,
+    "token": "4a63ce818ce84c645268f6efdc0aa5fb300d4b94d5b6cd351c942d10e393b0af",
+    "expiresAt": "2025-12-28T14:01:41.210Z",
+    "used": false,
+    "usedAt": null,
+    "ipAddress": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "createdAt": "2025-12-28T13:46:41.210Z"
+  },
+  {
+    "id": "token_bef1010d1c9b5c4a",
+    "userId": 1,
+    "token": "22bbd1e433c793b1de59c297cf1882a2b5dafd6db47973b9b71ee81f8da231b9",
+    "expiresAt": "2025-12-28T14:01:44.455Z",
+    "used": false,
+    "usedAt": null,
+    "ipAddress": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "createdAt": "2025-12-28T13:46:44.455Z"
+  },
+  {
+    "id": "token_caf175e025dba006",
+    "userId": 1,
+    "token": "4303ddceb83b5c67d1a738f8d6fcdbf136b3b4ef09b5caafa545bf2c1817b97f",
+    "expiresAt": "2025-12-28T14:01:52.212Z",
+    "used": false,
+    "usedAt": null,
+    "ipAddress": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+    "createdAt": "2025-12-28T13:46:52.212Z"
+  }
+]

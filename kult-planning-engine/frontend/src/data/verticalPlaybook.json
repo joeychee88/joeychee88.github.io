@@ -1,0 +1,871 @@
+{
+  "persona_mapping": {
+    "automotive_ice": {
+      "primary_personas": [
+        "Automotive Enthusiasts",
+        "Automotive Intent",
+        "Gadget Gurus",
+        "Emerging Affluents",
+        "Young Working Adult"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Sooka",
+        "YouTube Channels",
+        "Astro GO",
+        "Stadium Astro",
+        "Hotspot",
+        "Roda Panas"
+      ],
+      "watchouts": [
+        "Never use FMCG personas"
+      ]
+    },
+    "automotive_ev": {
+      "primary_personas": [
+        "Automotive Enthusiasts",
+        "Tech & Gadget Enthusiasts",
+        "Emerging Affluents"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Astro GO",
+        "Sooka",
+        "Awani",
+        "Stadium Astro"
+      ],
+      "watchouts": [
+        "Avoid mass targeting"
+      ]
+    },
+    "property_luxury": {
+      "primary_personas": [
+        "Home Buyers",
+        "Luxury Buyers",
+        "Emerging Affluents",
+        "Business & Professional"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Nona",
+        "PaMa",
+        "Pesona Pengantin",
+        "Impiana",
+        "Keluarga",
+        "Astro GO",
+        "Sooka"
+      ],
+      "watchouts": [
+        "Persona must match price tier"
+      ]
+    },
+    "property_mid_range": {
+      "primary_personas": [
+        "Home Buyers",
+        "Family Dynamic",
+        "Emerging Affluents"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Impiana",
+        "Keluarga",
+        "PaMa",
+        "Astro GO"
+      ],
+      "watchouts": [
+        "Avoid general mass personas"
+      ]
+    },
+    "property_affordable": {
+      "primary_personas": [
+        "Family Dynamic",
+        "Students",
+        "Youth Mom"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Keluarga",
+        "PaMa",
+        "Gempak"
+      ],
+      "watchouts": [
+        "Do not overspend on premium inventory"
+      ]
+    },
+    "fmcg": {
+      "primary_personas": [
+        "Foodies",
+        "Health & Wellness Shoppers",
+        "Youth Mom",
+        "Family Dynamic"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Rasa",
+        "Bintang Kecil",
+        "Era",
+        "Mingguan Wanita"
+      ],
+      "watchouts": [
+        "Avoid premium/luxury personas"
+      ]
+    },
+    "beauty": {
+      "primary_personas": [
+        "Fashion Icons",
+        "Young Working Adult",
+        "Youth Mom"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Hijabista",
+        "Remaja",
+        "Nona",
+        "Gempak",
+        "Mingguan Wanita",
+        "Xuan"
+      ],
+      "watchouts": [
+        "Avoid over-targeting one female segment"
+      ]
+    },
+    "retail_ecommerce": {
+      "primary_personas": [
+        "Online Shoppers",
+        "Fashion Icons",
+        "Family Dynamic",
+        "Students"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Gempak",
+        "Xuan",
+        "Hitz",
+        "Era"
+      ],
+      "watchouts": [
+        "Wrong price targeting"
+      ]
+    },
+    "finance_insurance": {
+      "primary_personas": [
+        "Corporate Visionaries",
+        "Business & Professional",
+        "Emerging Affluents"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Awani",
+        "Astro GO",
+        "Mix",
+        "Lite",
+        "My"
+      ],
+      "watchouts": [
+        "Avoid low-quality sites"
+      ]
+    },
+    "telco": {
+      "primary_personas": [
+        "Students",
+        "Young Working Adult",
+        "Emerging Affluents"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Hitz",
+        "My",
+        "Sinar",
+        "Xuan",
+        "Gempak"
+      ],
+      "watchouts": [
+        "Offer must be clear"
+      ]
+    },
+    "travel": {
+      "primary_personas": [
+        "Travel & Experience Seekers",
+        "Adventure Enthusiasts"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Libur",
+        "Sooka",
+        "Astro GO",
+        "Makan Bola"
+      ],
+      "watchouts": [
+        "Seasonality"
+      ]
+    },
+    "education": {
+      "primary_personas": [
+        "Students",
+        "Youth Mom",
+        "Little Steps Advocates"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "PaMa",
+        "Remaja",
+        "Keluarga",
+        "Xuan"
+      ],
+      "watchouts": [
+        "Long conversion time"
+      ]
+    },
+    "f_b": {
+      "primary_personas": [
+        "Foodies",
+        "Family Dynamic"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Rasa",
+        "Libur",
+        "Era",
+        "Melody"
+      ],
+      "watchouts": [
+        "Low conversion"
+      ]
+    },
+    "sme_b2b": {
+      "primary_personas": [
+        "SME",
+        "Corporate Visionaries",
+        "Business & Professional",
+        "Start-ups"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Awani",
+        "Astro GO",
+        "RojakDaily"
+      ],
+      "watchouts": [
+        "Avoid mass audiences"
+      ]
+    },
+    "tech_devices": {
+      "primary_personas": [
+        "Gadget Gurus",
+        "Esports Fans"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Stadium Astro",
+        "Sooka",
+        "Astro GO",
+        "Hotspot"
+      ],
+      "watchouts": [
+        "High CPAs expected"
+      ]
+    },
+    "banking_fintech": {
+      "primary_personas": [
+        "Emerging Affluents",
+        "Business & Professional"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Awani",
+        "My",
+        "Astro GO",
+        "Sinar"
+      ],
+      "watchouts": [
+        "Must show offer"
+      ]
+    },
+    "entertainment_ott": {
+      "primary_personas": [
+        "Music",
+        "Animation",
+        "Sports",
+        "EPL Fans",
+        "Comedy",
+        "Horror"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Stadium Astro",
+        "Astro GO",
+        "Sooka",
+        "Gempak"
+      ],
+      "watchouts": [
+        "Genre mismatch"
+      ]
+    },
+    "gaming": {
+      "primary_personas": [
+        "Esports Fans",
+        "Tech & Gadget Enthusiasts",
+        "Students"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Stadium Astro",
+        "Sooka",
+        "Hotspot"
+      ],
+      "watchouts": [
+        "High wastage risk"
+      ]
+    },
+    "luxury": {
+      "primary_personas": [
+        "Luxury Seekers",
+        "Luxury Buyers",
+        "Emerging Affluents"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Nona",
+        "Pesona Pengantin",
+        "Hijabista",
+        "VanillaKismis"
+      ],
+      "watchouts": [
+        "Wrong geo"
+      ]
+    },
+    "lifestyle": {
+      "primary_personas": [
+        "Active Lifestyle Seekers",
+        "Travel Seekers",
+        "Adventure",
+        "Eco",
+        "Romantic Comedy"
+      ],
+      "secondary_personas": [],
+      "key_ips": [
+        "Astro GO",
+        "Sooka",
+        "Gempak"
+      ],
+      "watchouts": [
+        "Wrong context"
+      ]
+    }
+  },
+  "vertical_playbook": {
+    "automotive_ice": {
+      "label": "Automotive (ICE)",
+      "strategy_dna": "Awareness + High Consideration",
+      "funnel": {
+        "awareness": [
+          "Product Collector",
+          "Data Capture",
+          "In-stream",
+          "In-Read",
+          "Video In-Banner",
+          "Interstitial",
+          "Countdown",
+          "Mini Game",
+          "Carousel"
+        ],
+        "consideration": [
+          "Product Collector",
+          "Data Capture",
+          "In-stream",
+          "In-Read",
+          "Video In-Banner",
+          "Interstitial",
+          "Countdown",
+          "Mini Game",
+          "Carousel"
+        ],
+        "conversion": [
+          "Product Collector",
+          "Data Capture",
+          "In-stream",
+          "In-Read",
+          "Video In-Banner",
+          "Interstitial",
+          "Countdown",
+          "Mini Game",
+          "Carousel"
+        ]
+      }
+    },
+    "automotive_ev": {
+      "label": "Automotive (EV)",
+      "strategy_dna": "Education + Lead",
+      "funnel": {
+        "awareness": [
+          "Data Capture",
+          "Product Collector",
+          "In-stream",
+          "Calculator Ads"
+        ],
+        "consideration": [
+          "Data Capture",
+          "Product Collector",
+          "In-stream",
+          "Calculator Ads"
+        ],
+        "conversion": [
+          "Data Capture",
+          "Product Collector",
+          "In-stream",
+          "Calculator Ads"
+        ]
+      }
+    },
+    "property_luxury": {
+      "label": "Property – Luxury",
+      "strategy_dna": "Premium Awareness + Lead Gen",
+      "funnel": {
+        "awareness": [
+          "Calculator",
+          "Data Capture",
+          "In-stream",
+          "Carousel",
+          "Skinner",
+          "Masthead",
+          "Site Takeover"
+        ],
+        "consideration": [
+          "Calculator",
+          "Data Capture",
+          "In-stream",
+          "Carousel",
+          "Skinner",
+          "Masthead",
+          "Site Takeover"
+        ],
+        "conversion": [
+          "Calculator",
+          "Data Capture",
+          "In-stream",
+          "Carousel",
+          "Skinner",
+          "Masthead",
+          "Site Takeover"
+        ]
+      }
+    },
+    "property_mid_range": {
+      "label": "Property – Mid Range",
+      "strategy_dna": "Lead + Filtering",
+      "funnel": {
+        "awareness": [
+          "Rich Media",
+          "Lead Formats",
+          "Carousel",
+          "Calculator"
+        ],
+        "consideration": [
+          "Rich Media",
+          "Lead Formats",
+          "Carousel",
+          "Calculator"
+        ],
+        "conversion": [
+          "Rich Media",
+          "Lead Formats",
+          "Carousel",
+          "Calculator"
+        ]
+      }
+    },
+    "property_affordable": {
+      "label": "Property – Affordable",
+      "strategy_dna": "High-volume awareness",
+      "funnel": {
+        "awareness": [
+          "Display",
+          "Social",
+          "Retargeting"
+        ],
+        "consideration": [
+          "Display",
+          "Social",
+          "Retargeting"
+        ],
+        "conversion": [
+          "Display",
+          "Social",
+          "Retargeting"
+        ]
+      }
+    },
+    "fmcg": {
+      "label": "FMCG",
+      "strategy_dna": "Volume reach + Frequency",
+      "funnel": {
+        "awareness": [
+          "Skinner",
+          "Masthead",
+          "Site Takeover",
+          "Leaderboard",
+          "MerryView",
+          "In-Stream"
+        ],
+        "consideration": [
+          "Skinner",
+          "Masthead",
+          "Site Takeover",
+          "Leaderboard",
+          "MerryView",
+          "In-Stream"
+        ],
+        "conversion": [
+          "Skinner",
+          "Masthead",
+          "Site Takeover",
+          "Leaderboard",
+          "MerryView",
+          "In-Stream"
+        ]
+      }
+    },
+    "beauty": {
+      "label": "Beauty",
+      "strategy_dna": "Social + Video",
+      "funnel": {
+        "awareness": [
+          "Product Collector",
+          "Carousel",
+          "In-Banner Video",
+          "Hotspot",
+          "Mini-Game"
+        ],
+        "consideration": [
+          "Product Collector",
+          "Carousel",
+          "In-Banner Video",
+          "Hotspot",
+          "Mini-Game"
+        ],
+        "conversion": [
+          "Product Collector",
+          "Carousel",
+          "In-Banner Video",
+          "Hotspot",
+          "Mini-Game"
+        ]
+      }
+    },
+    "retail_ecommerce": {
+      "label": "Retail / eCommerce",
+      "strategy_dna": "Performance + Retargeting",
+      "funnel": {
+        "awareness": [
+          "Countdown",
+          "Product Collector",
+          "Carousel",
+          "Catfish",
+          "MREC",
+          "Leaderboard"
+        ],
+        "consideration": [
+          "Countdown",
+          "Product Collector",
+          "Carousel",
+          "Catfish",
+          "MREC",
+          "Leaderboard"
+        ],
+        "conversion": [
+          "Countdown",
+          "Product Collector",
+          "Carousel",
+          "Catfish",
+          "MREC",
+          "Leaderboard"
+        ]
+      }
+    },
+    "finance_insurance": {
+      "label": "Finance / Insurance",
+      "strategy_dna": "Multi-step funnel",
+      "funnel": {
+        "awareness": [
+          "Calculator",
+          "Data Capture",
+          "Carousel",
+          "In-stream"
+        ],
+        "consideration": [
+          "Calculator",
+          "Data Capture",
+          "Carousel",
+          "In-stream"
+        ],
+        "conversion": [
+          "Calculator",
+          "Data Capture",
+          "Carousel",
+          "In-stream"
+        ]
+      }
+    },
+    "telco": {
+      "label": "Telco",
+      "strategy_dna": "Offer-first + Conversion",
+      "funnel": {
+        "awareness": [
+          "Carousel",
+          "Interstitial",
+          "Countdown",
+          "Mobile Banners"
+        ],
+        "consideration": [
+          "Carousel",
+          "Interstitial",
+          "Countdown",
+          "Mobile Banners"
+        ],
+        "conversion": [
+          "Carousel",
+          "Interstitial",
+          "Countdown",
+          "Mobile Banners"
+        ]
+      }
+    },
+    "travel": {
+      "label": "Travel",
+      "strategy_dna": "Promo + Inspiration",
+      "funnel": {
+        "awareness": [
+          "Countdown",
+          "Carousel",
+          "In-stream",
+          "MerryView"
+        ],
+        "consideration": [
+          "Countdown",
+          "Carousel",
+          "In-stream",
+          "MerryView"
+        ],
+        "conversion": [
+          "Countdown",
+          "Carousel",
+          "In-stream",
+          "MerryView"
+        ]
+      }
+    },
+    "education": {
+      "label": "Education",
+      "strategy_dna": "Lead-first",
+      "funnel": {
+        "awareness": [
+          "Lead Form",
+          "Carousel",
+          "Calculator"
+        ],
+        "consideration": [
+          "Lead Form",
+          "Carousel",
+          "Calculator"
+        ],
+        "conversion": [
+          "Lead Form",
+          "Carousel",
+          "Calculator"
+        ]
+      }
+    },
+    "f_b": {
+      "label": "F&B",
+      "strategy_dna": "Short-video + Proximity",
+      "funnel": {
+        "awareness": [
+          "Catfish",
+          "Carousel",
+          "Leaderboard",
+          "Mobile Banner"
+        ],
+        "consideration": [
+          "Catfish",
+          "Carousel",
+          "Leaderboard",
+          "Mobile Banner"
+        ],
+        "conversion": [
+          "Catfish",
+          "Carousel",
+          "Leaderboard",
+          "Mobile Banner"
+        ]
+      }
+    },
+    "sme_b2b": {
+      "label": "SME / B2B",
+      "strategy_dna": "Lead + Trust",
+      "funnel": {
+        "awareness": [
+          "Calculator",
+          "Lead Form",
+          "Data Capture",
+          "Carousel"
+        ],
+        "consideration": [
+          "Calculator",
+          "Lead Form",
+          "Data Capture",
+          "Carousel"
+        ],
+        "conversion": [
+          "Calculator",
+          "Lead Form",
+          "Data Capture",
+          "Carousel"
+        ]
+      }
+    },
+    "tech_devices": {
+      "label": "Tech & Devices",
+      "strategy_dna": "Education + Comparison",
+      "funnel": {
+        "awareness": [
+          "Product Collector",
+          "CubeVibe",
+          "Countdown",
+          "In-stream"
+        ],
+        "consideration": [
+          "Product Collector",
+          "CubeVibe",
+          "Countdown",
+          "In-stream"
+        ],
+        "conversion": [
+          "Product Collector",
+          "CubeVibe",
+          "Countdown",
+          "In-stream"
+        ]
+      }
+    },
+    "banking_fintech": {
+      "label": "Banking / Fintech",
+      "strategy_dna": "Lead > Consideration",
+      "funnel": {
+        "awareness": [
+          "Calculator",
+          "Lead Form",
+          "Carousel"
+        ],
+        "consideration": [
+          "Calculator",
+          "Lead Form",
+          "Carousel"
+        ],
+        "conversion": [
+          "Calculator",
+          "Lead Form",
+          "Carousel"
+        ]
+      }
+    },
+    "entertainment_ott": {
+      "label": "Entertainment / OTT",
+      "strategy_dna": "Hype + Video",
+      "funnel": {
+        "awareness": [
+          "Trailer",
+          "In-stream",
+          "MerryView",
+          "Skinner",
+          "Site Takeover"
+        ],
+        "consideration": [
+          "Trailer",
+          "In-stream",
+          "MerryView",
+          "Skinner",
+          "Site Takeover"
+        ],
+        "conversion": [
+          "Trailer",
+          "In-stream",
+          "MerryView",
+          "Skinner",
+          "Site Takeover"
+        ]
+      }
+    },
+    "gaming": {
+      "label": "Gaming",
+      "strategy_dna": "Short Video + Engagement",
+      "funnel": {
+        "awareness": [
+          "Mini Game",
+          "CubeVibe",
+          "Video In-Banner",
+          "In-stream"
+        ],
+        "consideration": [
+          "Mini Game",
+          "CubeVibe",
+          "Video In-Banner",
+          "In-stream"
+        ],
+        "conversion": [
+          "Mini Game",
+          "CubeVibe",
+          "Video In-Banner",
+          "In-stream"
+        ]
+      }
+    },
+    "luxury": {
+      "label": "Luxury",
+      "strategy_dna": "Premium Awareness",
+      "funnel": {
+        "awareness": [
+          "Skinner",
+          "Masthead",
+          "Site Takeover",
+          "Interstitial"
+        ],
+        "consideration": [
+          "Skinner",
+          "Masthead",
+          "Site Takeover",
+          "Interstitial"
+        ],
+        "conversion": [
+          "Skinner",
+          "Masthead",
+          "Site Takeover",
+          "Interstitial"
+        ]
+      }
+    },
+    "lifestyle": {
+      "label": "Lifestyle",
+      "strategy_dna": "Storytelling",
+      "funnel": {
+        "awareness": [
+          "OTT Video",
+          "Rich Media"
+        ],
+        "consideration": [
+          "OTT Video",
+          "Rich Media"
+        ],
+        "conversion": [
+          "OTT Video",
+          "Rich Media"
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "last_updated": "2025-12-04T06:47:40.421Z",
+    "source": "Google Sheets Logic Table",
+    "spreadsheet_id": "1MxEB4SpLeP9JTvUF9_g9pGNhUjVEx7lLEKCt6UCdxQQ",
+    "total_industries": 20
+  }
+}

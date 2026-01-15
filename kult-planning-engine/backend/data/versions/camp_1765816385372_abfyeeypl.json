@@ -1,0 +1,40 @@
+[
+  {
+    "versionId": "v1765816409749",
+    "timestamp": "2025-12-15T16:33:29.749Z",
+    "changeNote": "Auto-save update",
+    "data": {
+      "campaignName": "Test",
+      "advertiserName": "Toyota",
+      "objective": "Lead generation",
+      "industry": "automotive_ice",
+      "brandProduct": "Vios",
+      "startDate": "2026-01-09",
+      "endDate": "2026-03-15",
+      "selectedPersonas": [],
+      "audienceIntent": "",
+      "audienceExclusions": "",
+      "demographicFilters": {
+        "race": [],
+        "generation": [],
+        "income": []
+      },
+      "audienceGroups": [],
+      "selectedStates": [],
+      "selectedFormats": [],
+      "totalBudget": "",
+      "budgetFlexibility": "fixed",
+      "buyingPreference": "no_preference",
+      "selectedSites": [],
+      "optimisedGroups": [],
+      "estimatedImpressions": 0,
+      "budgetBreakdown": {},
+      "budgetChannels": [],
+      "currentStep": 2,
+      "id": "camp_1765816385372_abfyeeypl",
+      "status": "draft",
+      "createdAt": "2025-12-15T16:33:05.372Z",
+      "updatedAt": "2025-12-15T16:33:29.747Z"
+    }
+  }
+]

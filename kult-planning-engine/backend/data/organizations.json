@@ -1,0 +1,92 @@
+[
+  {
+    "id": "org_63c7ed9b408d4d9e",
+    "name": "TechCorp Malaysia",
+    "industry": "Technology",
+    "adminUserId": null,
+    "assignedSalesPersonId": "sales_default_001",
+    "teamMembers": [],
+    "status": "active",
+    "createdAt": "2025-12-27T15:44:39.811Z",
+    "metadata": {
+      "address": "",
+      "website": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "org_58b4c9bb05e7702d",
+    "name": "Retail Solutions Sdn Bhd",
+    "industry": "Retail",
+    "adminUserId": null,
+    "assignedSalesPersonId": "sales_default_002",
+    "teamMembers": [],
+    "status": "active",
+    "createdAt": "2025-12-27T15:44:39.895Z",
+    "metadata": {
+      "address": "",
+      "website": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "org_f57809a357bb2af7",
+    "name": "Financial Services Group",
+    "industry": "Finance",
+    "adminUserId": null,
+    "assignedSalesPersonId": "sales_default_001",
+    "teamMembers": [],
+    "status": "active",
+    "createdAt": "2025-12-27T15:44:39.950Z",
+    "metadata": {
+      "address": "",
+      "website": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "org_83e56534c4d3bf8c",
+    "name": "Healthcare Plus",
+    "industry": "Healthcare",
+    "adminUserId": null,
+    "assignedSalesPersonId": null,
+    "teamMembers": [],
+    "status": "active",
+    "createdAt": "2025-12-27T15:44:40.036Z",
+    "metadata": {
+      "address": "",
+      "website": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "org_25588eb161a512d1",
+    "name": "Education Excellence",
+    "industry": "Education",
+    "adminUserId": null,
+    "assignedSalesPersonId": null,
+    "teamMembers": [],
+    "status": "active",
+    "createdAt": "2025-12-27T15:44:40.078Z",
+    "metadata": {
+      "address": "",
+      "website": "",
+      "notes": ""
+    }
+  },
+  {
+    "id": "org_c77b9f570358bca6",
+    "name": "KULT",
+    "industry": "professional_services",
+    "adminUserId": null,
+    "assignedSalesPersonId": null,
+    "teamMembers": [],
+    "status": "active",
+    "createdAt": "2025-12-27T17:58:21.501Z",
+    "metadata": {
+      "address": "",
+      "website": "",
+      "notes": ""
+    }
+  }
+]

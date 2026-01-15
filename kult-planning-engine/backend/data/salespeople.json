@@ -1,0 +1,56 @@
+[
+  {
+    "id": "sales_default_001",
+    "name": "Sarah Johnson",
+    "email": "sarah@kult.my",
+    "phone": "+60123456789",
+    "department": "FMCG & Retail",
+    "territory": "Klang Valley",
+    "industries": [
+      "fmcg",
+      "beauty",
+      "retail_ecommerce",
+      "f_and_b"
+    ],
+    "assignedOrganizations": [],
+    "activeClientsCount": 0,
+    "status": "active",
+    "createdAt": "2025-12-26T09:35:14.386Z"
+  },
+  {
+    "id": "sales_default_002",
+    "name": "Kevin Tan",
+    "email": "kevin@kult.my",
+    "phone": "+60123456790",
+    "department": "Automotive & Tech",
+    "territory": "Nationwide",
+    "industries": [
+      "automotive_ice",
+      "automotive_ev",
+      "tech_devices",
+      "gaming"
+    ],
+    "assignedOrganizations": [],
+    "activeClientsCount": 0,
+    "status": "active",
+    "createdAt": "2025-12-26T09:35:14.387Z"
+  },
+  {
+    "id": "sales_default_003",
+    "name": "Michelle Lee",
+    "email": "michelle@kult.my",
+    "phone": "+60123456791",
+    "department": "Finance & Property",
+    "territory": "Central Region",
+    "industries": [
+      "banking_fintech",
+      "finance_insurance",
+      "property_luxury",
+      "property_mid_range"
+    ],
+    "assignedOrganizations": [],
+    "activeClientsCount": 0,
+    "status": "active",
+    "createdAt": "2025-12-26T09:35:14.387Z"
+  }
+]
