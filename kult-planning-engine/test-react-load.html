@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React Load Test</title>
+    <script>
+        // Capture all console messages
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const logs = [];
+        
+        function captureLogs() {
+            console.log = function(...args) {
+                logs.push({type: 'log', msg: args.join(' ')});
+                originalLog.apply(console, args);
+            };
+            console.error = function(...args) {
+                logs.push({type: 'error', msg: args.join(' ')});
+                originalError.apply(console, args);
+            };
+            console.warn = function(...args) {
+                logs.push({type: 'warn', msg: args.join(' ')});
+                originalWarn.apply(console, args);
+            };
+        }
+        captureLogs();
+        
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const root = document.getElementById('root');
+                const iframe = parent.document.getElementById('testFrame');
+                const report = {
+                    rootExists: !!root,
+                    rootHasContent: root && root.children.length > 0,
+                    rootHTML: root ? root.innerHTML.substring(0, 500) : 'NO ROOT',
+                    logs: logs.slice(0, 20),
+                    errors: logs.filter(l => l.type === 'error')
+                };
+                
+                // Send report back to parent
+                if (iframe) {
+                    window.parent.postMessage(report, '*');
+                }
+                
+                console.log('REACT TEST REPORT:', report);
+            }, 3000);
+        });
+        
+        // Catch any unhandled errors
+        window.addEventListener('error', (e) => {
+            console.error('UNHANDLED ERROR:', e.message, e.filename, e.lineno);
+            logs.push({type: 'error', msg: `${e.message} at ${e.filename}:${e.lineno}`});
+        });
+    </script>
+</head>
+<body style="margin:0;padding:0;">
+    <iframe id="testFrame" src="/" style="width:100%;height:100vh;border:none;"></iframe>
+</body>
+</html>

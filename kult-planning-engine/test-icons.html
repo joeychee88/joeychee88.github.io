@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Size Test - KULT Planning Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0A0E1A;
+            color: white;
+            font-family: Inter, sans-serif;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #121827;
+            border-radius: 10px;
+            border: 1px solid #1E293B;
+        }
+        .icon-demo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #1E293B;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .icon-label {
+            font-weight: 600;
+            min-width: 150px;
+        }
+        .size-info {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="text-3xl font-bold mb-6">🎨 Icon Size Test</h1>
+        <p class="text-gray-400 mb-8">Testing icon sizes in expanded vs collapsed sidebar states</p>
+        
+        <div class="space-y-4">
+            <!-- Expanded State -->
+            <div>
+                <h2 class="text-xl font-semibold mb-3 text-cyan-400">📖 Expanded Sidebar (w-5 h-5 = 20px)</h2>
+                
+                <div class="icon-demo">
+                    <span class="icon-label">Home Icon:</span>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span class="size-info">20px × 20px</span>
+                </div>
+
+                <div class="icon-demo">
+                    <span class="icon-label">AI Wizard Icon:</span>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <span class="size-info">20px × 20px</span>
+                </div>
+
+                <div class="icon-demo">
+                    <span class="icon-label">Users Icon:</span>
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span class="size-info">20px × 20px</span>
+                </div>
+            </div>
+
+            <!-- Collapsed State -->
+            <div>
+                <h2 class="text-xl font-semibold mb-3 text-purple-400">📁 Collapsed Sidebar (w-8 h-8 = 32px)</h2>
+                
+                <div class="icon-demo">
+                    <span class="icon-label">Home Icon:</span>
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span class="size-info">32px × 32px (+60%)</span>
+                </div>
+
+                <div class="icon-demo">
+                    <span class="icon-label">AI Wizard Icon:</span>
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <span class="size-info">32px × 32px (+60%)</span>
+                </div>
+
+                <div class="icon-demo">
+                    <span class="icon-label">Users Icon:</span>
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span class="size-info">32px × 32px (+60%)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 p-4 bg-cyan-900/20 border border-cyan-500/50 rounded-lg">
+            <h3 class="text-lg font-semibold text-cyan-400 mb-2">✅ Expected Behavior</h3>
+            <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
+                <li>Expanded sidebar: Icons are <strong>20px × 20px</strong> (w-5 h-5)</li>
+                <li>Collapsed sidebar: Icons grow to <strong>32px × 32px</strong> (w-8 h-8)</li>
+                <li>This is a <strong>60% size increase</strong> making them clearly visible</li>
+                <li>Toggle/logout buttons remain at <strong>20px</strong> always</li>
+            </ul>
+        </div>
+
+        <div class="mt-4 p-4 bg-yellow-900/20 border border-yellow-500/50 rounded-lg">
+            <h3 class="text-lg font-semibold text-yellow-400 mb-2">⚠️ If Icons Still Look Small</h3>
+            <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
+                <li>Press <strong>Ctrl+Shift+R</strong> (Windows) or <strong>Cmd+Shift+R</strong> (Mac)</li>
+                <li>Open DevTools (F12) → Application → Clear site data</li>
+                <li>Try in <strong>Incognito/Private mode</strong></li>
+                <li>Check console for errors (F12)</li>
+            </ul>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/" class="inline-block px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all">
+                ← Back to Application
+            </a>
+        </div>
+
+        <div class="mt-6 text-center text-sm text-gray-500">
+            Version: 3.5.8 | Build: 1767764143 | Commit: 040a583
+        </div>
+    </div>
+
+    <script>
+        // Log icon sizes for debugging
+        console.log('🎨 Icon Size Test Page Loaded');
+        console.log('Expected sizes:');
+        console.log('  - Expanded (w-5 h-5): 20px × 20px');
+        console.log('  - Collapsed (w-8 h-8): 32px × 32px');
+        
+        // Measure actual rendered sizes
+        const expandedIcon = document.querySelector('.w-5.h-5');
+        const collapsedIcon = document.querySelector('.w-8.h-8');
+        
+        if (expandedIcon) {
+            const rect = expandedIcon.getBoundingClientRect();
+            console.log(`✅ Expanded icon actual size: ${rect.width}px × ${rect.height}px`);
+        }
+        
+        if (collapsedIcon) {
+            const rect = collapsedIcon.getBoundingClientRect();
+            console.log(`✅ Collapsed icon actual size: ${rect.width}px × ${rect.height}px`);
+        }
+    </script>
+</body>
+</html>
